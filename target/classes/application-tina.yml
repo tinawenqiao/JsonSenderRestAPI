@@ -1,0 +1,9 @@
+es:
+  addresses: ttp:localhost9200
+
+server:
+  port: 8082
+  #context-path: /
+  debug: true
+
+
