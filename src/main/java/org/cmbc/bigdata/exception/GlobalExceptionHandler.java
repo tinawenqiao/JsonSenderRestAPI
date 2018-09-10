@@ -345,9 +345,13 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return handleExceptionInternal(ex, null, headers, status, webRequest);
   }
 
-
   private ResponseEntity<Object> buildResponseEntity(RestResult restErrorResponse) {
     return new ResponseEntity(restErrorResponse, restErrorResponse.getStatus());
   }
 
+  @ExceptionHandler(value = RuntimeException.class)
+  public Object baseErrorHandler(HttpServletRequest req, Exception e) {
+    String error = "Runtime Exception:" + e;
+    return buildResponseEntity(new RestResult(HttpStatus.INTERNAL_SERVER_ERROR, error, e));
+  }
 }

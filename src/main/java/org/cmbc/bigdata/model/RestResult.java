@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 
@@ -35,7 +34,7 @@ public class RestResult {
     this.code = httpStatus.value();
     this.msg = msg;
     Map errorMsg = new HashMap();
-    errorMsg.put("errorMsg", ex.getLocalizedMessage());
+    errorMsg.put("error", ex.getLocalizedMessage());
     this.setData(errorMsg);
   }
 

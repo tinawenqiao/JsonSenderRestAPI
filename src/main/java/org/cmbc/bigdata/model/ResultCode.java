@@ -10,9 +10,15 @@ public enum ResultCode {
   /* 参数错误：10001-19999 */
   PARAM_IS_INVALID(10001, "Param is invalid."),
 
-  /* Interface Error：60001-69999 */
+  /* Interface Elasticsearch Error：60001-69999 */
   INTERFACE_ELASTICSEARCH_CLIENT_GET_ERROR(60001, "RestClient got from elasticsearch is null."),
-  INTERFACE_ELASTICSEARCH_PERFORM_ERROR(60002, "Perform Request on elasticsearch failure.");
+  INTERFACE_ELASTICSEARCH_PERFORM_ERROR(60002, "Perform Request on elasticsearch failure."),
+
+  /* Interface Zabbix Error：70001-79999 */
+  INTERFACE_ZABBIX_LOGIN_ERROR(70001,"Zabbix login failure."),
+  INTERFACE_ZABBIX_SENDER_ERROR(70003,"Zabbix sender failure."),
+  INTERFACE_ZABBIX_SENDER_PARTIAL_FAILURE(70004,"Zabbix sender partial failure."),
+  INTERFACE_ZABBIX_SENDER_ALL_FAILURE(70005,"Zabbix sender all failure.");
 
   private Integer code;
 

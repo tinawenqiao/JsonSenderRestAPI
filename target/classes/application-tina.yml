@@ -1,5 +1,12 @@
 es:
   addresses: ttp:localhost9200
+zabbix:
+  host: 127.0.0.1
+  serverport: 10051
+  apiport: 8888
+  user: Admin
+  passwd: zabbix
+  defaultHostgroup: bigdata
 
 server:
   port: 8082
