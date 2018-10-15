@@ -1,6 +1,7 @@
 package org.cmbc.bigdata.controller;
 
 import io.github.hengyunabc.zabbix.sender.DataObject;
+import io.swagger.annotations.ApiOperation;
 import org.cmbc.bigdata.model.ElasticsearchModel;
 import org.cmbc.bigdata.model.RestResult;
 import org.cmbc.bigdata.model.ZabbixMetric;
@@ -36,19 +37,20 @@ public class SenderController {
     return restResult;
   }
 
-  @PostMapping("/zabbix/p1")
-  public RestResult sendToZabbixP1(@RequestBody@Valid List<DataObject> zabbixData) {
-    //zabbixService.testZabbixApi();
-    //zabbixService.testZabbixSender();
+  @PostMapping("/zabbix/format/original")
+  @ApiOperation(value = "Send data to zabbix in the format of list of original format.")
+  public RestResult sendToZabbixInOriginalFormat(@RequestBody@Valid List<DataObject> zabbixData) {
     return zabbixService.send(zabbixData);
   }
 
-  @PostMapping("/zabbix/p2")
-  public RestResult sendToZabbixP2(@RequestBody@Valid List<ZabbixMetric> zabbixMetrics) {
-    return zabbixService.sendP2(zabbixMetrics);
+  @PostMapping("/zabbix/format/derived")
+  @ApiOperation(value = "Send data to zabbix in the format of list of derived format.")
+  public RestResult sendToZabbixInDerivedFormat(@RequestBody@Valid List<ZabbixMetric> zabbixMetrics) {
+    return zabbixService.sendDerivedFormat(zabbixMetrics);
   }
 
   @PostMapping("/zabbix/check")
+  @ApiOperation(value = "Check whether host and item exist.")
   public RestResult checkZabbixData(@RequestBody List<ZabbixMetric> zabbixMetrics) {
     return zabbixService.checkZabbixData(zabbixMetrics);
   }

@@ -18,7 +18,13 @@ public enum ResultCode {
   INTERFACE_ZABBIX_LOGIN_ERROR(70001,"Zabbix login failure."),
   INTERFACE_ZABBIX_SENDER_ERROR(70003,"Zabbix sender failure."),
   INTERFACE_ZABBIX_SENDER_PARTIAL_FAILURE(70004,"Zabbix sender partial failure."),
-  INTERFACE_ZABBIX_SENDER_ALL_FAILURE(70005,"Zabbix sender all failure.");
+  INTERFACE_ZABBIX_SENDER_ALL_FAILURE(70005,"Zabbix sender all failure."),
+  INTERFACE_ZABBIX_CREATE_HOSTGROUP_FAILURE(70010,"Zabbix host group create failure."),
+  INTERFACE_ZABBIX_SEARCH_HOSTGROUP_FAILURE(70011,"Zabbix host group search failure."),
+  INTERFACE_ZABBIX_CREATE_HOST_FAILURE(70012,"Zabbix host create failure."),
+  INTERFACE_ZABBIX_SEARCH_HOST_FAILURE(70013,"Zabbix host search failure."),
+  INTERFACE_ZABBIX_SEARCH_INTERFACE_FAILURE(70014,"Zabbix interface search failure."),
+  INTERFACE_ZABBIX_CREATE_ITEM_FAILURE(70015,"Zabbix item create failure.");
 
   private Integer code;
 

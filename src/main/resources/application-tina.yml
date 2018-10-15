@@ -1,5 +1,8 @@
 es:
-  addresses: ttp:localhost9200
+  authentication: false
+  user: gateway
+  passwd: gateway
+  addresses: 127.0.0.1:9500
 zabbix:
   host: 127.0.0.1
   serverport: 10051

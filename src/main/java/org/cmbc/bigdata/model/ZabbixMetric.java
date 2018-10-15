@@ -1,10 +1,10 @@
 package org.cmbc.bigdata.model;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 public class ZabbixMetric {
   // Metric fetch time. Format:yyyy-MM-dd HH:mm:ss
   public String timestamp;

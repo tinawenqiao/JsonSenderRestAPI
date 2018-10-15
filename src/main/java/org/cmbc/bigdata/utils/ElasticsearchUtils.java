@@ -4,8 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j;
 import org.apache.http.HttpHost;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.cmbc.bigdata.config.ESConnectConfig;
 import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,6 +29,15 @@ public class ElasticsearchUtils {
 
   @Autowired
   private ESConnectConfig esConnectConfig;
+
+  @Value("${es.authentication}")
+  public boolean authentication;
+
+  @Value("${es.user}")
+  public String esUser;
+
+  @Value("${es.passwd}")
+  public String esPasswd;
 
   @Value("${es.addresses}")
   public String addresses;
@@ -56,7 +71,21 @@ public class ElasticsearchUtils {
       }
     }
 
-    return RestClient.builder(hosts).build();
+    RestClientBuilder builder = RestClient.builder(hosts);
+
+    if (authentication) {
+      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      credentialsProvider.setCredentials(AuthScope.ANY,
+              new UsernamePasswordCredentials(esUser, esPasswd));
+      builder.setHttpClientConfigCallback(new RestClientBuilder.HttpClientConfigCallback() {
+        @Override
+        public HttpAsyncClientBuilder customizeHttpClient(HttpAsyncClientBuilder httpClientBuilder) {
+          return httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+        }
+      });
+    }
+
+    return builder.build();
   }
 
   private ArrayList<String> getAddresses() {
