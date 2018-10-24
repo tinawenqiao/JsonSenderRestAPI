@@ -1,5 +1,6 @@
 package org.cmbc.bigdata.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -17,4 +18,7 @@ public class ZabbixMetric {
   public String value;
   // Mapping to item Application.
   //public String itemApplication;
+
+  public ZabbixMetric() {
+  }
 }
