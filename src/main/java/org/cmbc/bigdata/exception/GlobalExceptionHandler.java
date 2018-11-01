@@ -1,6 +1,6 @@
 package org.cmbc.bigdata.exception;
 
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.cmbc.bigdata.model.RestResult;
 import org.springframework.beans.ConversionNotSupportedException;
 import org.springframework.beans.TypeMismatchException;
@@ -32,7 +32,7 @@ import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Set;
 
-@Log4j
+@Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
   /**

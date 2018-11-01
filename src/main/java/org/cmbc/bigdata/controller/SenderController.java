@@ -33,7 +33,7 @@ public class SenderController {
 
   @PostMapping("/elasticsearch")
   public RestResult sendToES(@RequestBody@Valid ElasticsearchModel esModel) {
-    RestResult restResult = elasticsearchService.write(esModel.getIndex(), esModel.getType(), esModel.getDoc());
+    RestResult restResult = elasticsearchService.write(esModel.getIndex(), esModel.getType(), esModel.getData());
 
     return restResult;
   }

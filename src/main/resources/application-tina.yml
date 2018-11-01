@@ -16,4 +16,7 @@ server:
   #context-path: /
   debug: true
 
+logging:
+  file: logs/json-sender.log
+
 

@@ -5,6 +5,7 @@
 
 # Log file
 *.log
+logs/
 
 # BlueJ files
 *.ctxt
@@ -45,3 +46,5 @@ buildNumber.properties
 .gitignore
 .idea/emacs.xml
 .idea/vcs.xml
+logs/json-sender.log.2018-10-31.0.gz
+src/main/java/zabbix/

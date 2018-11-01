@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.nio.entity.NStringEntity;
@@ -21,11 +21,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-@Log4j
+@Slf4j
 @Getter
 @Setter
 @Service
@@ -40,16 +38,29 @@ public class ElasticsearchService {
     restClient = elasticsearchUtils.getRestClient();
   }
 
-  public RestResult write(String index, String type, Map doc) {
+  public RestResult write(String index, String type, Object data) {
+    if (data instanceof Map) {
+      return singleWrite(index, type, (Map)data);
+    } else if (data instanceof List) {
+      return bulkWrite(index, type, (List<Map>)data);
+    } else {
+      RestResult restResult = RestResult.failure(ResultCode.PARAM_IS_INVALID,
+              ResultCode.PARAM_IS_INVALID.message(), "Data field can only support Map or List<Map>.");
+      restResult.setStatus(HttpStatus.BAD_REQUEST);
+      return restResult;
+    }
+  }
+
+  public RestResult singleWrite(String index, String type, Map data) {
     String method = "post";
     String endpoint = String.format("/%s/%s", index, type);
     String jsonStr = "";
     RestResult restResult;
 
-    log.info("index:" + index + ",type:" + type + ", doc:" + doc.toString());
+    log.info("Request: index:" + index + ",type:" + type + ", data:" + data.toString());
     ObjectMapper mapper = new ObjectMapper();
     try {
-      jsonStr = mapper.writeValueAsString(doc);
+      jsonStr = mapper.writeValueAsString(data);
     } catch (JsonProcessingException jsonProcessingException) {
       restResult = RestResult.failure(ResultCode.PARAM_IS_INVALID,
               ResultCode.PARAM_IS_INVALID.message(), jsonProcessingException.getMessage());
@@ -57,6 +68,39 @@ public class ElasticsearchService {
     }
 
     NStringEntity requestBody = new NStringEntity(jsonStr, ContentType.APPLICATION_JSON);
+
+    return performOnElasticsearch(method, endpoint, Collections.singletonMap("pretty", "true"), requestBody);
+  }
+
+  public RestResult bulkWrite(String index, String type, List<Map> data) {
+    RestResult restResult;
+    String method = "post";
+    String endpoint = String.format("/%s/%s/_bulk", index, type);
+    String actionMetaData = String.format("{ \"index\" : { \"_index\" : \"%s\", \"_type\" : \"%s\" } }%n", index, type);
+
+    log.info("Request: index:" + index + ",type:" + type + ", data:" + data.toString());
+
+    List<String> bulkData = new ArrayList<>();
+    for (int i=0; i<data.size(); i++) {
+      ObjectMapper mapper = new ObjectMapper();
+      try {
+        String jsonStr = mapper.writeValueAsString(data.get(i));
+        bulkData.add(jsonStr);
+      } catch (JsonProcessingException jsonProcessingException) {
+        restResult = RestResult.failure(ResultCode.PARAM_IS_INVALID,
+                ResultCode.PARAM_IS_INVALID.message(), jsonProcessingException.getMessage());
+        restResult.setStatus(HttpStatus.BAD_REQUEST);
+      }
+    }
+
+    StringBuilder bulkRequestBody = new StringBuilder();
+    for (String bulkItem : bulkData) {
+      bulkRequestBody.append(actionMetaData);
+      bulkRequestBody.append(bulkItem);
+      bulkRequestBody.append("\n");
+    }
+
+    NStringEntity requestBody = new NStringEntity(bulkRequestBody.toString(), ContentType.APPLICATION_JSON);
 
     return performOnElasticsearch(method, endpoint, Collections.singletonMap("pretty", "true"), requestBody);
   }

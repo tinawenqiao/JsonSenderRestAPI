@@ -6,7 +6,7 @@ import io.github.hengyunabc.zabbix.sender.SenderResult;
 import io.github.hengyunabc.zabbix.sender.ZabbixSender;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.log4j.Log4j;
+import lombok.extern.slf4j.Slf4j;
 import org.cmbc.bigdata.config.ZabbixConnectConfig;
 import org.cmbc.bigdata.model.RestResult;
 import org.cmbc.bigdata.model.ResultCode;
@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Log4j
+@Slf4j
 @Getter
 @Setter
 @Service
@@ -75,10 +75,10 @@ public class ZabbixService {
   }
 
   public RestResult send(List<DataObject> dataObjectList) {
+    log.info("Request data:{}", dataObjectList.toString());
     this.initZabbixSender();
-    log.info("Connect to Zabbix host =" + this.zabbixSender.getHost() +
-            ", port=" + this.zabbixSender.getPort());
-    RestResult restResult;
+    log.info("Connect to Zabbix host:{}, port:{}", this.zabbixSender.getHost(), this.zabbixSender.getPort());
+    RestResult restResult = new RestResult();
     try {
       SenderResult senderResult = this.zabbixSender.send(dataObjectList);
       if (senderResult.success()) {
@@ -86,6 +86,7 @@ public class ZabbixService {
       } else {
         String msg = "Sent Total:" + senderResult.getTotal() + ", Processed:" +
                 senderResult.getProcessed() + ", Failed:" + senderResult.getFailed();
+        log.info(msg);
         if (senderResult.getProcessed() > 0) {
           restResult = RestResult.failure(ResultCode.INTERFACE_ZABBIX_SENDER_PARTIAL_FAILURE,
                   ResultCode.INTERFACE_ZABBIX_SENDER_PARTIAL_FAILURE.message(), msg);
@@ -211,12 +212,12 @@ public class ZabbixService {
         if (!zabbixApi.hostgroupExists(hostgroup)) {
           ZabbixAPIResult hostgroupCreateResult = zabbixApi.hostgroupCreate(hostgroup);
           if (hostgroupCreateResult.isFail()) {
-            log.info("Create host group :" + hostgroup + " failed.");
+            log.info("Create host group:{} failed.", hostgroup);
             response.get(host).put("code", ResultCode.INTERFACE_ZABBIX_CREATE_HOSTGROUP_FAILURE.code());
             response.get(host).put("msg", ResultCode.INTERFACE_ZABBIX_CREATE_HOSTGROUP_FAILURE.message());
             continue;
           }
-          log.info("Create host group :" + hostgroup + " successfully.");
+          log.info("Create host group:{} successfully.", hostgroup);
           JsonNode hostgroupids = (JsonNode) hostgroupCreateResult.getData();
           if (hostgroupids.get("groupids").size() > 0) {
             hostgroupId = hostgroupids.get("groupids").get(0).asText();
@@ -225,7 +226,7 @@ public class ZabbixService {
           //Get host group id
           ZabbixAPIResult hostgroupGetResult = zabbixApi.hostgroupGetByGroupName(hostgroup);
           if (hostgroupGetResult.isFail()) {
-            log.info("Search host group :" + hostgroup + " failed.");
+            log.info("Search host group:{} failed.", hostgroup);
             response.get(host).put("code", ResultCode.INTERFACE_ZABBIX_SEARCH_HOSTGROUP_FAILURE.code());
             response.get(host).put("msg", ResultCode.INTERFACE_ZABBIX_SEARCH_HOSTGROUP_FAILURE.message());
             continue;
@@ -241,7 +242,7 @@ public class ZabbixService {
           ArrayList<String> groupIdList = new ArrayList();
           groupIdList.add(hostgroupId);
           ZabbixAPIResult hostCreateResult = zabbixApi.hostCreate(host, groupIdList, createHostInterface("10050", "1"));
-          log.info("Create host:" + host + ", groupId:" + hostgroupId);
+          log.info("Create host:{}, groupId:{}.", host, hostgroupId);
           if (hostCreateResult.isFail()) {
             log.info("Create host :" + host + " failed.");
             response.get(host).put("code", ResultCode.INTERFACE_ZABBIX_CREATE_HOST_FAILURE.code());
@@ -254,7 +255,7 @@ public class ZabbixService {
       ZabbixAPIResult hostGetResult = zabbixApi.hostGetByHostName(host);
       String currentHostId = null;
       if (hostGetResult.isFail()) {
-        log.info("Search host :" + host + " failed.");
+        log.info("Search host :{} failed.", host);
         response.get(host).put("code", ResultCode.INTERFACE_ZABBIX_SEARCH_HOST_FAILURE.code());
         response.get(host).put("msg", ResultCode.INTERFACE_ZABBIX_SEARCH_HOST_FAILURE.message());
         continue;
@@ -263,10 +264,10 @@ public class ZabbixService {
       if (hostArray.size() > 0) {
         currentHostId = hostArray.get(0).get("hostid").asText();
       }
-      log.info("host:" + host + ",hostid:" + hostid + ", curretHostId:" + currentHostId);
+      log.info("host:{}, hostid:{}, currentHostId:{}.", host, hostid, currentHostId);
       //If hostid changed
       if (hostid != null && !hostid.equals(currentHostId)) {
-        log.info("host:" + host + " hostid has changed.");
+        log.info("host:{} hostid has changed.", host);
       }
 
       hostid = currentHostId;

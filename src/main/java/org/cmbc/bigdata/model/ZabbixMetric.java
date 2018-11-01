@@ -1,6 +1,5 @@
 package org.cmbc.bigdata.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
